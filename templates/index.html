@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>A Simple MPD Web Client</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Album</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for song in playlist %}
+            <tr>
+                <td>{{ song["title"] }}</td>
+                <td>{{ song["artist"] }}</td>
+                <td>{{ song["album"] }}</td>
+                <td>{{ song["time"] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div>
+        <ul>
+            <li><a id="play" href="#">Play</a></li>
+            <li><a id="pause" href="#">Pause</a></li>
+            <li><a id="next" href="#">Next</a></li>
+            <li><a id="previous" href="#">Previous</a></li>
+            <li><a id="stop" href="#">Stop</a></li>
+        </ul>
+    </div>
+
+    <div>
+        {{ current }}
+    </div>
+
+<!-- JavaScript stuff! -->
+<script src="/static/js/jquery-1.10.2.min.js"></script>
+<script>
+$(document).ready(function() {
+
+    function acall(action) {
+        $.ajax({
+            url: "/" + action,
+            success: function (data) {
+                // What to do w/ data/response
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+                // What to do when error occurred
+            },
+            // timeout : 15000 // Timeout
+        });
+    }
+
+    // Play event
+    $("#play").click(function(e) {
+        e.preventDefault();
+        acall("play");
+    })
+
+    // Pause event
+    $("#pause").click(function(e) {
+        e.preventDefault(e);
+        acall("pause");
+    })
+
+    // Next event
+    $("#next").click(function(e) {
+        e.preventDefault();
+        acall("next");
+    })
+
+    // Previous event
+    $("#previous").click(function(e) {
+        e.preventDefault();
+        acall("previous");
+    })
+
+    // Stop event
+    $("#stop").click(function(e) {
+        e.preventDefault();
+        acall("stop");
+    })
+
+})
+</script>
+
+</body>
+</html>
