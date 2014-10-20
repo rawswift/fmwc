@@ -1,121 +1,236 @@
-<html>
-<head>
-    <title>A Simple MPD Web Client</title>
-</head>
-<body>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Artist</th>
-                <th>Album</th>
-                <th>Time</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for song in playlist %}
-            <tr>
-                <td>{{ song["title"] }}</td>
-                <td>{{ song["artist"] }}</td>
-                <td>{{ song["album"] }}</td>
-                <td>{{ song["time"] }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <div>
-        <ul>
-            <li><a id="play" href="#">Play</a></li>
-            <li><a id="pause" href="#">Pause</a></li>
-            <li><a id="next" href="#">Next</a></li>
-            <li><a id="previous" href="#">Previous</a></li>
-            <li><a id="stop" href="#">Stop</a></li>
-        </ul>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
 
-    <!-- Current song -->
-    <div>
-        <div>
-            <h3>Current Song:</h3>
+    <title>fmwc - A Simple MPD Web Client</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/bootstrap/assets/css/custom.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/static/bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <div class="starter-template">
+
+        <div class="row">
+
+          <div class="col-md-12">
+
+            <div class="row">
+
+              <div class="col-md-12">
+                <h3 id="song-title">{{ current['title'] }}</h3>
+                <h4 id="song-artist">{{ current['artist'] }}</h4>
+              </div>
+
+              <div class="col-md-12">
+                <div class="progress">
+                  <div id="progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}%;"></div>
+                </div>
+              </div>
+
+
+              <div class="col-md-12">
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="pull-right">
+
+                      <button id="btn-backward" type="button" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-backward"></span>
+                      </button>
+
+                      <button id="btn-play" type="button" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-play"></span>
+                      </button>
+
+                      <button id="btn-pause" type="button" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-pause"></span>
+                      </button>
+
+                      <button id="btn-forward" type="button" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-forward"></span>
+                      </button>
+                      
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="pull-left">
+
+                      <button id="btn-repeat" type="button" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-repeat"></span>
+                      </button>
+
+                      <button id="btn-random" type="button" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-random"></span>
+                      </button>
+
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
-        <div>
-        {{ current }}
-        <div>
-    </div>
-    <!-- Current song -->
 
-    <!-- Status -->
-    <div>
-        <div>
-            <h3>Status:</h3>
-        </div>
-        <div>
-        {{ status }}
-        <div>
-    </div>
-    <!-- Status -->
+      </div>
 
-    <!-- Stats -->
-    <div>
-        <div>
-            <h3>Statistics:</h3>
-        </div>
-        <div>
-        {{ stats }}
-        <div>
-    </div>
-    <!-- Stats -->    
+    </div><!-- /.container -->
 
-<!-- JavaScript stuff! -->
-<script src="/static/js/jquery-1.10.2.min.js"></script>
-<script>
-$(document).ready(function() {
 
-    function acall(action) {
-        $.ajax({
-            url: "/" + action,
-            success: function (data) {
-                // What to do w/ data/response
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-                // What to do when error occurred
-            },
-            // timeout : 15000 // Timeout
-        });
-    }
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/bootstrap/assets/js/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
-    // Play event
-    $("#play").click(function(e) {
-        e.preventDefault();
-        acall("play");
+    <!-- Event stuff! -->
+    <script>
+    $(document).ready(function() {
+
+    {% if status['state'] == "stop" %}
+        $("#btn-pause").hide();
+        $("#btn-play").show();
+    {% elif status['state'] == "pause" %}
+        $("#btn-pause").hide();
+        $("#btn-play").show();
+    {% else %}
+        $("#btn-play").hide();
+        $("#btn-pause").show();
+    {% endif %}
+
+        function acall(action) {
+            $.ajax({
+                url: "/" + action,
+                success: function (data) {
+                    // What to do w/ data/response
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    // What to do when error occurred
+                },
+                // timeout : 15000 // Timeout
+            });
+        }
+
+        function doPoll() {
+            $.ajax({
+                url: "/poll",
+                success: function (data) {
+                    var progress = (data.elapsed/data.time)*100;
+                    $("#song-title").text(data.title);
+                    $("#song-artist").text(data.artist);
+                    $("#progress-bar").attr('aria-valuenow', progress);
+                    $("#progress-bar").css('width', progress + '%');
+
+                    if (data.repeat == 1) {
+                        $("#btn-repeat").addClass('active');
+                    } else {
+                        $("#btn-repeat").removeClass('active');
+                    }
+
+                    if (data.random == 1) {
+                        $("#btn-random").addClass('active');
+                    } else {
+                        $("#btn-random").removeClass('active');
+                    }                    
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    // What to do when error occurred
+                }
+            });
+            window.pollTimeOutId = setTimeout(doPoll,500);
+        }
+
+        function stopPoll() {
+            pollId = window.pollTimeOutId;
+            clearTimeout(pollId);
+        }
+
+    {% if status['state'] == "play" %}
+        doPoll();
+    {% endif %}
+
+        // Play event
+        $("#btn-play").click(function(e) {
+            e.preventDefault();
+            $("#btn-play").hide();
+            $("#btn-pause").show();
+            acall("play");
+            stopPoll();
+            doPoll();
+        })
+
+        // Pause event
+        $("#btn-pause").click(function(e) {
+            e.preventDefault(e);
+            $("#btn-pause").hide();
+            $("#btn-play").show();
+            acall("pause");
+            stopPoll();
+        })
+
+        // Forward/Next event
+        $("#btn-forward").click(function(e) {
+            e.preventDefault();
+            $("#btn-play").hide();
+            $("#btn-pause").show();            
+            acall("next");
+            stopPoll();
+            doPoll();
+        })
+
+        // Backward/Previous event
+        $("#btn-backward").click(function(e) {
+            e.preventDefault();
+            $("#btn-play").hide();
+            $("#btn-pause").show();
+            acall("previous");
+            stopPoll();
+            doPoll();
+        })
+
+        // Toggle repeat
+        $("#btn-repeat").click(function(e) {
+            e.preventDefault();
+            acall("togglerepeat");
+            $("#btn-repeat").toggleClass('active');
+        })
+
+        // Toggle random
+        $("#btn-random").click(function(e) {
+            e.preventDefault();
+            acall("togglerandom");
+            $("#btn-random").toggleClass('active');
+        })
+
     })
+    </script>
 
-    // Pause event
-    $("#pause").click(function(e) {
-        e.preventDefault(e);
-        acall("pause");
-    })
-
-    // Next event
-    $("#next").click(function(e) {
-        e.preventDefault();
-        acall("next");
-    })
-
-    // Previous event
-    $("#previous").click(function(e) {
-        e.preventDefault();
-        acall("previous");
-    })
-
-    // Stop event
-    $("#stop").click(function(e) {
-        e.preventDefault();
-        acall("stop");
-    })
-
-})
-</script>
-
-</body>
+  </body>
 </html>

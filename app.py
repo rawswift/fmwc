@@ -18,6 +18,58 @@ def index():
     # Get status
     status = client.status()
 
+    client.close()
+    client.disconnect()
+
+    # Create empty (playlist) list
+    pl = []
+
+    for song in playlist:
+            s = {}
+
+            # Format time 00:00:00
+            s["time"] = str(datetime.timedelta(seconds=float(song["time"])))
+
+            if song.has_key("title") and not song["title"] is None:
+                s["title"] = song["title"]
+            else:
+                s["title"] = "Unknown"
+
+            if song.has_key("artist") and not song["artist"] is None:
+                s["artist"] = song["artist"]
+            else:
+                s["artist"] = "Unknown"
+
+            if song.has_key("album") and not song["album"] is None:
+                s["album"] = song["album"]
+            else:
+                s["album"] = "Unknown"
+            
+            pl.append(s)
+
+            progress = 0
+            if current.has_key("time") and status.has_key("elapsed"):
+                time = int(current['time']);
+                elapsed = float(status['elapsed'])
+                progress = (elapsed/time)*100
+
+
+    return render_template("index.html", playlist=pl, current=current, status=status, progress=progress)
+
+@app.route("/dev")
+def dev():
+    client = MPDClient()
+    client.connect("localhost", 6600)
+
+    # Get song(s) in the playlist
+    playlist = client.playlistinfo()
+
+    # Get current song
+    current = client.currentsong()
+
+    # Get status
+    status = client.status()
+
     # Get stats
     stats = client.stats()
 
@@ -50,7 +102,7 @@ def index():
             
             pl.append(s)
 
-    return render_template("index.html", playlist=pl, current=current, status=status, stats=stats)
+    return render_template("dev.html", playlist=pl, current=current, status=status, stats=stats)
 
 @app.route("/play")
 def play():
@@ -116,6 +168,61 @@ def stop():
     client.disconnect()
 
     return jsonify(ok=True)
+
+@app.route("/togglerepeat")
+def togglerepeat():
+    client = MPDClient()
+    client.connect("localhost", 6600)
+
+    # Get status
+    status = client.status()
+
+    repeat = int(status['repeat'])
+    if repeat == 1:
+        client.repeat(0)
+    else:
+        client.repeat(1)
+
+    client.close()
+    client.disconnect()
+
+    return jsonify(ok=True)
+
+@app.route("/togglerandom")
+def togglerandom():
+    client = MPDClient()
+    client.connect("localhost", 6600)
+
+    # Get status
+    status = client.status()
+
+    random = int(status['random'])
+    if random == 1:
+        client.random(0)
+    else:
+        client.random(1)
+
+    client.close()
+    client.disconnect()
+
+    return jsonify(ok=True)    
+
+@app.route("/poll")
+def poll():
+    client = MPDClient()
+    client.connect("localhost", 6600)
+
+    # Get current song
+    current = client.currentsong()
+
+    # Get status
+    status = client.status()
+    elapsed = float(status['elapsed'])
+
+    client.close()
+    client.disconnect()
+
+    return jsonify(artist=current['artist'], title=current['title'], time=current['time'], elapsed=elapsed, repeat=status['repeat'], random=status['random'])
 
 if __name__ == "__main__":
     app.debug = True
