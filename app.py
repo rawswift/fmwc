@@ -15,6 +15,12 @@ def index():
     # Get current song
     current = client.currentsong()
 
+    # Get status
+    status = client.status()
+
+    # Get stats
+    stats = client.stats()
+
     client.close()
     client.disconnect()
 
@@ -44,7 +50,7 @@ def index():
             
             pl.append(s)
 
-    return render_template("index.html", playlist=pl, current=current)
+    return render_template("index.html", playlist=pl, current=current, status=status, stats=stats)
 
 @app.route("/play")
 def play():
