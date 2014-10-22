@@ -205,7 +205,7 @@ def togglerandom():
     client.close()
     client.disconnect()
 
-    return jsonify(ok=True)    
+    return jsonify(ok=True)
 
 @app.route("/poll")
 def poll():
@@ -222,7 +222,19 @@ def poll():
     client.close()
     client.disconnect()
 
-    return jsonify(artist=current['artist'], title=current['title'], time=current['time'], elapsed=elapsed, repeat=status['repeat'], random=status['random'])
+    return jsonify(artist=current['artist'], title=current['title'], time=current['time'], elapsed=elapsed, repeat=status['repeat'], random=status['random'], volume=status['volume'])
+
+@app.route("/volume/<value>")
+def volume(value):
+    client = MPDClient()
+    client.connect("localhost", 6600)
+
+    client.setvol(value)
+
+    client.close()
+    client.disconnect()
+
+    return jsonify(ok=True, value=value)
 
 if __name__ == "__main__":
     app.debug = True

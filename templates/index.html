@@ -15,6 +15,7 @@
 
     <!-- Custom styles for this template -->
     <link href="/static/bootstrap/assets/css/custom.css" rel="stylesheet">
+    <link href="/static/bootstrap/assets/css/slider.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/static/bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
@@ -86,6 +87,14 @@
                 </div>
               </div>
 
+              <!-- Volume -->
+              <div class="col-md-12">
+                <br />
+                <div class="slider slider-horizontal" style="width: 300px;">
+                    <input id="volume" type="text" class="span2" value="{{ status['volume'] }}" style="">
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -102,6 +111,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/static/bootstrap/assets/js/jquery.min.js"></script>
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/bootstrap/assets/js/bootstrap-slider.js"></script>    
 
     <!-- Event stuff! -->
     <script>
@@ -168,6 +178,27 @@
     {% if status['state'] == "play" %}
         doPoll();
     {% endif %}
+
+        var VolumeSlider = function() {
+            $.ajax({
+                url: "/volume/" + sl.getValue(),
+                success: function (data) {
+                    // What to do w/ data/response
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                    // What to do when error occurred
+                },
+                // timeout : 15000 // Timeout
+            });            
+        }
+
+        var sl = $('.slider').slider({
+            'min': 0,
+            'max': 100,
+            'value': {{ status['volume'] }}
+        }).on('slide', VolumeSlider).data('slider');
+
+        // sl.slider('value', 50);
 
         // Play event
         $("#btn-play").click(function(e) {
